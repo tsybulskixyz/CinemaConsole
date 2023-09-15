@@ -1,0 +1,146 @@
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter the number of rows:");
+        int rows = scanner.nextInt();
+        System.out.println("Enter the number of seats in each row:");
+        int seats = scanner.nextInt();
+        char[][] cinemaHall = new char[rows + 1][seats + 1];
+        for (int i = 0; i < rows + 1; i++) {
+            for (int j = 0; j < seats + 1; j++) {
+                cinemaHall[i][j] = 'S';
+                cinemaHall[0][j] = Character.forDigit(j, seats + 1);
+                cinemaHall[i][0] = Character.forDigit(i, rows + 1);
+                cinemaHall[0][0] = ' ';
+            }
+        }
+        printMenu();
+        userInput(rows, seats, cinemaHall);
+    }
+
+    public static void printMenu() {
+        System.out.print("""
+                
+                1. Show the seats
+                2. Buy a ticket
+                3. Statistics
+                0. Exit
+                """);
+    }
+
+    public static void userInput(int rows, int seats, char[][] cinemaHall) {
+        Scanner scanner = new Scanner(System.in);
+        int userInput = scanner.nextInt();
+        while (userInput != 0) {
+            switch (userInput) {
+                case 1 -> printSeats(cinemaHall);
+                case 2 -> buyTicket(rows, seats, cinemaHall);
+                case 3 -> statistics(rows, seats, cinemaHall);
+            }
+            printMenu();
+            userInput = scanner.nextInt();
+        }
+    }
+
+    public static void printSeats(char[][] cinemaHall) {
+        System.out.println("\nCinema:");
+        for (char[] chars : cinemaHall) {
+            for (int j = 0; j < cinemaHall[0].length; j++) {
+                System.out.print(chars[j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    public static void buyTicket(int rows, int seats, char[][] cinemaHall) {
+        Scanner scanner = new Scanner(System.in);
+        int numberOfRow = 0;
+        int numberOfSeat = 0;
+        char boughtTicket = 'B';
+        boolean rightAnswer = false;
+        while (!rightAnswer) {
+            System.out.println("\nEnter a row number:");
+            numberOfRow = scanner.nextInt();
+            System.out.println("Enter a seat number in that row:");
+            numberOfSeat = scanner.nextInt();
+            if (numberOfRow > cinemaHall.length - 1 || numberOfSeat > cinemaHall[0].length - 1) {
+                System.out.println("Wrong input!");
+                continue;
+            } else if (cinemaHall[numberOfRow][numberOfSeat] == boughtTicket) {
+                System.out.println("That ticket has already been purchased!");
+                continue;
+            }
+            rightAnswer = true;
+            cinemaHall[numberOfRow][numberOfSeat] = boughtTicket;
+            System.out.println("Ticket price: $" + ticketPrice(rows, seats, numberOfRow));
+        }
+    }
+
+    public static int ticketPrice(int rows, int seats, int numberOfRow) {
+        int fullSpace = rows * seats;
+        int price;
+        price = fullSpace <= 60 ? 10 : numberOfRow <= rows / 2 ? 10 : 8;
+        return price;
+    }
+
+    public static void statistics(int rows, int seats, char[][] cinemaHall) {
+        String percentChar = "%%"; // I don't know why, but I can't white %% into block. I'm getting a formatting error
+        System.out.printf("""
+                
+                Number of purchased tickets: %d
+                Percentage: %.2f%s
+                Current income: $%d
+                Total income: $%d
+                """.formatted(numberOfPurchasedTickets(cinemaHall), percentage(rows, seats, cinemaHall),
+                percentChar, currentIncome(rows,seats,cinemaHall), totalIncome(rows, seats)));
+    }
+
+    public static int numberOfPurchasedTickets(char[][] cinemaHall) {
+        int count = 0;
+        for (char[] chars : cinemaHall) {
+            for (int j = 0; j < cinemaHall[0].length; j++) {
+                if (chars[j] == 'B') {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    public static float percentage(int rows, int seats, char[][] cinemaHall) {
+        float fullSpace = rows * seats;
+        return (numberOfPurchasedTickets(cinemaHall) / fullSpace) * 100;
+    }
+
+    public static int currentIncome(int rows, int seats, char[][] cinemaHall) {
+        int currentIncome = 0;
+        for (int i = 0; i < cinemaHall.length; i++) {
+            char[] chars = cinemaHall[i];
+            for (int j = 0; j < cinemaHall[0].length; j++) {
+                if (chars[j] == 'B') {
+                    currentIncome += ticketPrice(rows, seats, i);
+                }
+            }
+        }
+        return currentIncome;
+    }
+
+    public static int totalIncome(int rows, int seats) {
+        int totalIncome = 0;
+        int[][] arrOfPrices = new int[rows][seats];
+        for (int i = 0; i < arrOfPrices.length; i++) {
+            for (int j = 0; j < arrOfPrices[0].length; j++) {
+                arrOfPrices[i][j] = ticketPrice(rows, seats, i + 1);
+            }
+        }
+        for (int[] arrOfPrice : arrOfPrices) {
+            for (int j = 0; j < arrOfPrices[0].length; j++) {
+                totalIncome += arrOfPrice[j];
+            }
+        }
+        return totalIncome;
+    }
+}
