@@ -8,6 +8,12 @@ public class Main {
         int rows = scanner.nextInt();
         System.out.println("Enter the number of seats in each row:");
         int seats = scanner.nextInt();
+        char[][] cinemaHall = cinemaHall(rows, seats);
+        printMenu();
+        userInput(rows, seats, cinemaHall);
+    }
+
+    public static char[][] cinemaHall(int rows, int seats) {
         char[][] cinemaHall = new char[rows + 1][seats + 1];
         for (int i = 0; i < rows + 1; i++) {
             for (int j = 0; j < seats + 1; j++) {
@@ -17,8 +23,7 @@ public class Main {
                 cinemaHall[0][0] = ' ';
             }
         }
-        printMenu();
-        userInput(rows, seats, cinemaHall);
+        return cinemaHall;
     }
 
     public static void printMenu() {
@@ -30,7 +35,7 @@ public class Main {
                 0. Exit
                 """);
     }
-
+    
     public static void userInput(int rows, int seats, char[][] cinemaHall) {
         Scanner scanner = new Scanner(System.in);
         int userInput = scanner.nextInt();
